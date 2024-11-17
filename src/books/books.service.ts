@@ -5,12 +5,15 @@ import { Book } from './entities/book.entity';
 import { DataSource, Repository } from 'typeorm';
 import { throwIfEmpty } from 'rxjs';
 import { GetBooksDto } from './dto/get-books.dto';
+import { Review } from 'src/reviews/entities/review.entity';
 
 @Injectable()
 export class BooksService {
   constructor(
     @InjectRepository(Book)
     private bookRepository: Repository<Book>,
+    @InjectRepository(Review)
+    private reviewRepository: Repository<Review>,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -53,7 +56,22 @@ export class BooksService {
     return this.bookRepository.findOne({ where: { id } });
   }
 
-  remove(id: number) {
+  async remove(id: number) {
+    // 책이 존재하는지 확인
+    const exists = await this.bookRepository.findOne({ where: { id } });
+    if (!exists) {
+      throw new HttpException(`Book ${id} not found.`, HttpStatus.NOT_FOUND);
+    }
+
+    // 책에 연결된 리뷰가 있는지 확인
+    const count = await this.reviewRepository.count({ where: { bookId: id } });
+    if (count) {
+      throw new HttpException(
+        `Cannot delete book ${id} with ${count} reviews.`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     return this.bookRepository.delete(id);
   }
 }
