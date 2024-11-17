@@ -5,6 +5,8 @@ import { BooksModule } from './books/books.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Book } from './books/entities/book.entity';
+import { ReviewsModule } from './reviews/reviews.module';
+import { Review } from './reviews/entities/review.entity';
 
 @Module({
   imports: [
@@ -16,10 +18,11 @@ import { Book } from './books/entities/book.entity';
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE,
-      entities: [Book],
+      entities: [Book, Review],
       synchronize: true,
     }),
     BooksModule,
+    ReviewsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

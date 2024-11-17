@@ -11,6 +11,7 @@ export class BooksService {
     @InjectRepository(Book)
     private bookRepository: Repository<Book>,
   ) {}
+
   create(createBookDto: CreateBookDto) {
     const { isbn } = createBookDto;
 

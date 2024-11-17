@@ -17,11 +17,6 @@ export class BooksController {
     return this.booksService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string): Promise<Book> {
-    return this.booksService.findOne(+id);
-  }
-
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.booksService.remove(+id);
