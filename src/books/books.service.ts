@@ -2,22 +2,25 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateBookDto } from './dto/create-book.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Book } from './entities/book.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { throwIfEmpty } from 'rxjs';
+import { GetBooksDto } from './dto/get-books.dto';
 
 @Injectable()
 export class BooksService {
   constructor(
     @InjectRepository(Book)
     private bookRepository: Repository<Book>,
+    private readonly dataSource: DataSource,
   ) {}
 
-  create(createBookDto: CreateBookDto) {
+  async create(createBookDto: CreateBookDto) {
     const { isbn } = createBookDto;
 
-    const isExist = this.bookRepository.findOne({
+    const isExist = await this.bookRepository.findOne({
       where: { isbn: createBookDto.isbn },
     });
+
     if (isExist) {
       throw new HttpException(
         `ISBN ${isbn} already exists.`,
@@ -29,8 +32,21 @@ export class BooksService {
     return 'This action adds a new book';
   }
 
-  findAll(): Promise<Book[]> {
-    return this.bookRepository.find();
+  async findAll(): Promise<GetBooksDto[]> {
+    // 책 정보와 평균 점수 조회
+    const result = await this.dataSource.query(
+      `
+      SELECT 
+        book.id, isbn, title, thumbnail, IFNULL(Round(AVG(rating), 0), 0) as averageRating 
+      FROM book 
+      LEFT JOIN review ON review.bookId = book.id 
+      GROUP BY book.id`,
+    );
+
+    return result.map((book) => ({
+      ...book,
+      averageRating: +book.averageRating,
+    }));
   }
 
   findOne(id: number) {

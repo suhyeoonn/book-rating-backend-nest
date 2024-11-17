@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
-import { Book } from './interfaces/book.interface';
 
 @Controller('books')
 export class BooksController {
@@ -13,7 +12,7 @@ export class BooksController {
   }
 
   @Get()
-  async findAll(): Promise<Book[]> {
+  async findAll() {
     return this.booksService.findAll();
   }
 
