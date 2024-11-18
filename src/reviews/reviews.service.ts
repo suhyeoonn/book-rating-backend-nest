@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import {
   CreateReviewDto,
   ReviewCreateResponseDto,
@@ -25,7 +25,7 @@ export class ReviewsService {
     createReviewDto: CreateReviewDto,
   ): Promise<ReviewCreateResponseDto> {
     // 책이 존재하는지 확인
-    this.validateBook(bookId);
+    await this.validateBook(bookId);
 
     // 리뷰 생성 및 저장
     const { content, rating } = createReviewDto;
@@ -51,8 +51,8 @@ export class ReviewsService {
   }
 
   async remove(bookId: number, id: number): Promise<ReviewDeleteResponseDto> {
-    this.validateBook(bookId);
-    this.validateReview(id);
+    await this.validateBook(bookId);
+    await this.validateReview(id);
 
     await this.reviewRepository.delete(id);
     return { averageRating: await this.getAverageRating(bookId) };
@@ -61,20 +61,14 @@ export class ReviewsService {
   async validateBook(bookId: number) {
     const book = await this.bookRepository.findOne({ where: { id: bookId } });
     if (!book) {
-      throw new HttpException(
-        `Book with ID ${bookId} not found`,
-        HttpStatus.NOT_FOUND,
-      );
+      throw new NotFoundException(`Book ${bookId} not found.`);
     }
   }
 
   async validateReview(id: number) {
     const review = await this.reviewRepository.findOne({ where: { id } });
     if (!review) {
-      throw new HttpException(
-        `Review with ID ${id} not found`,
-        HttpStatus.NOT_FOUND,
-      );
+      throw new NotFoundException(`Review with ID ${id} not found`);
     }
   }
 

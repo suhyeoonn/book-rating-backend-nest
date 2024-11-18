@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateBookDto } from './dto/create-book.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Book } from './entities/book.entity';
@@ -25,10 +30,7 @@ export class BooksService {
     });
 
     if (isExist) {
-      throw new HttpException(
-        `ISBN ${isbn} already exists.`,
-        HttpStatus.CONFLICT, // HTTP 409 상태 코드
-      );
+      throw new ConflictException(`ISBN ${isbn} already exists.`);
     }
 
     this.bookRepository.save(createBookDto).then(() => throwIfEmpty());
@@ -57,21 +59,26 @@ export class BooksService {
   }
 
   async remove(id: number) {
-    // 책이 존재하는지 확인
-    const exists = await this.bookRepository.findOne({ where: { id } });
-    if (!exists) {
-      throw new HttpException(`Book ${id} not found.`, HttpStatus.NOT_FOUND);
-    }
+    await this.validateBook(id);
 
-    // 책에 연결된 리뷰가 있는지 확인
-    const count = await this.reviewRepository.count({ where: { bookId: id } });
-    if (count) {
-      throw new HttpException(
-        `Cannot delete book ${id} with ${count} reviews.`,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    await this.checkHasReview(id);
 
     return this.bookRepository.delete(id);
+  }
+
+  async validateBook(bookId: number) {
+    const book = await this.bookRepository.findOne({ where: { id: bookId } });
+    if (!book) {
+      throw new NotFoundException(`Book ${bookId} not found.`);
+    }
+  }
+
+  async checkHasReview(bookId: number) {
+    const count = await this.reviewRepository.count({ where: { bookId } });
+    if (count) {
+      throw new BadRequestException(
+        `Cannot delete book ${bookId} with ${count} reviews.`,
+      );
+    }
   }
 }
