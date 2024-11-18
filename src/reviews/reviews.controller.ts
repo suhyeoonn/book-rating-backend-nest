@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 
@@ -9,7 +17,7 @@ export class ReviewsController {
   @Post()
   create(
     @Param('bookId') bookId: string,
-    @Body() createReviewDto: CreateReviewDto,
+    @Body(new ValidationPipe()) createReviewDto: CreateReviewDto,
   ) {
     return this.reviewsService.create(+bookId, createReviewDto);
   }
