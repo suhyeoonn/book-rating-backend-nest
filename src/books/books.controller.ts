@@ -16,9 +16,6 @@ export class BooksController {
 
   @Post()
   create(@Body(new ValidationPipe()) createBookDto: CreateBookDto) {
-    // TODO:
-    // 컨트롤러에서 에러 반환. 서비스는 단일 로직만 처리
-    // TODO: Exception 보기
     return this.booksService.create(createBookDto);
   }
 

@@ -24,9 +24,6 @@ export class ReviewsService {
     bookId: number,
     createReviewDto: CreateReviewDto,
   ): Promise<ReviewCreateResponseDto> {
-    // 책이 존재하는지 확인
-    await this.validateBook(bookId);
-
     // 리뷰 생성 및 저장
     const savedReview = await this.saveReview(bookId, createReviewDto);
 
@@ -48,8 +45,6 @@ export class ReviewsService {
   }
 
   async findAll(bookId: number): Promise<GetReviewDto> {
-    await this.validateBook(bookId);
-
     const reviews = await this.reviewRepository.find({
       where: { bookId },
     });
@@ -58,7 +53,6 @@ export class ReviewsService {
   }
 
   async remove(bookId: number, id: number): Promise<ReviewDeleteResponseDto> {
-    await this.validateBook(bookId);
     await this.validateReview(id);
 
     await this.reviewRepository.delete(id);
