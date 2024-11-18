@@ -28,13 +28,7 @@ export class ReviewsService {
     await this.validateBook(bookId);
 
     // 리뷰 생성 및 저장
-    const { content, rating } = createReviewDto;
-    const savedReview = await this.reviewRepository.save({
-      bookId,
-      content,
-      rating,
-      userId: 1,
-    });
+    const savedReview = await this.saveReview(bookId, createReviewDto);
 
     return {
       review: savedReview,
@@ -42,7 +36,20 @@ export class ReviewsService {
     };
   }
 
+  private async saveReview(bookId: number, createReviewDto: CreateReviewDto) {
+    const { content, rating } = createReviewDto;
+
+    return this.reviewRepository.save({
+      bookId,
+      content,
+      rating,
+      userId: 1, // 실제 사용자 ID 처리 필요
+    });
+  }
+
   async findAll(bookId: number): Promise<GetReviewDto> {
+    await this.validateBook(bookId);
+
     const reviews = await this.reviewRepository.find({
       where: { bookId },
     });
@@ -58,21 +65,21 @@ export class ReviewsService {
     return { averageRating: await this.getAverageRating(bookId) };
   }
 
-  async validateBook(bookId: number) {
+  private async validateBook(bookId: number) {
     const book = await this.bookRepository.findOne({ where: { id: bookId } });
     if (!book) {
       throw new NotFoundException(`Book ${bookId} not found.`);
     }
   }
 
-  async validateReview(id: number) {
+  private async validateReview(id: number) {
     const review = await this.reviewRepository.findOne({ where: { id } });
     if (!review) {
       throw new NotFoundException(`Review with ID ${id} not found`);
     }
   }
 
-  async getAverageRating(bookId: number) {
+  private async getAverageRating(bookId: number) {
     const result = await this.dataSource
       .createQueryBuilder()
       .select('AVG(review.rating)', 'averageRating')
