@@ -9,3 +9,13 @@ export class UserDto {
   @IsNotEmpty()
   password: string;
 }
+
+export class LoginResponseDto {
+  user: User;
+  accessToken: string;
+}
+
+class User {
+  id: number;
+  username: string;
+}

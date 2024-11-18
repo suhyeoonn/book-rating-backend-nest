@@ -3,17 +3,19 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { UserDto } from './dto/user.dto';
+import { LoginResponseDto, UserDto } from './dto/user.dto';
 import { Repository } from 'typeorm';
 import { User } from './entity/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    private jwtService: JwtService,
   ) {}
 
   async registerUser(newUser: UserDto): Promise<{ message: string }> {
@@ -32,7 +34,7 @@ export class AuthService {
     return { message: 'User registered successfully.' };
   }
 
-  async validateUser(userDto: UserDto): Promise<string | undefined> {
+  async validateUser(userDto: UserDto): Promise<LoginResponseDto | undefined> {
     const foundUser = await this.userRepository.findOne({
       where: { username: userDto.username },
     });
@@ -46,7 +48,9 @@ export class AuthService {
       throw new UnauthorizedException();
     }
 
-    return 'loginSuccess';
+    const payload = { id: foundUser.id, username: foundUser.username };
+
+    return { user: payload, accessToken: this.jwtService.sign(payload) };
   }
 
   async hashPassword(password: string): Promise<string> {
