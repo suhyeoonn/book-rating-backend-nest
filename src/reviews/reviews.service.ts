@@ -23,9 +23,15 @@ export class ReviewsService {
   async create(
     bookId: number,
     createReviewDto: CreateReviewDto,
+    userId: number,
   ): Promise<ReviewCreateResponseDto> {
-    // 리뷰 생성 및 저장
-    const savedReview = await this.saveReview(bookId, createReviewDto);
+    const { content, rating } = createReviewDto;
+    const savedReview = await this.reviewRepository.save({
+      bookId,
+      content,
+      rating,
+      userId,
+    });
 
     return {
       review: savedReview,
@@ -33,23 +39,26 @@ export class ReviewsService {
     };
   }
 
-  private async saveReview(bookId: number, createReviewDto: CreateReviewDto) {
-    const { content, rating } = createReviewDto;
-
-    return this.reviewRepository.save({
-      bookId,
-      content,
-      rating,
-      userId: 1, // 실제 사용자 ID 처리 필요
-    });
-  }
-
   async findAll(bookId: number): Promise<GetReviewDto> {
     const reviews = await this.reviewRepository.find({
       where: { bookId },
+      relations: ['user'],
     });
 
-    return { bookId, reviews };
+    const filteredReviews = reviews.map(
+      ({ id, rating, content, updatedAt, user }) => ({
+        id,
+        rating,
+        content,
+        updatedAt,
+        user: {
+          id: user.id,
+          username: user.username,
+        },
+      }),
+    );
+
+    return { bookId, reviews: filteredReviews };
   }
 
   async remove(bookId: number, id: number): Promise<ReviewDeleteResponseDto> {
@@ -57,13 +66,6 @@ export class ReviewsService {
 
     await this.reviewRepository.delete(id);
     return { averageRating: await this.getAverageRating(bookId) };
-  }
-
-  private async validateBook(bookId: number) {
-    const book = await this.bookRepository.findOne({ where: { id: bookId } });
-    if (!book) {
-      throw new NotFoundException(`Book ${bookId} not found.`);
-    }
   }
 
   private async validateReview(id: number) {

@@ -9,6 +9,7 @@ import { User } from './entity/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { Payload } from './security/payload.interface';
 
 @Injectable()
 export class AuthService {
@@ -53,9 +54,24 @@ export class AuthService {
     return { user: payload, accessToken: this.jwtService.sign(payload) };
   }
 
-  async hashPassword(password: string): Promise<string> {
+  private async hashPassword(password: string): Promise<string> {
     const saltRounds = 10; // 솔트 라운드 수
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     return hashedPassword;
+  }
+
+  async tokenValidateUser(payload: Payload): Promise<Payload> {
+    const user = await this.userRepository.findOne({
+      where: { id: payload.id },
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    return {
+      id: user.id,
+      username: user.username,
+    };
   }
 }

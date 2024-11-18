@@ -5,6 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entity/user.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
+import { PassportModule } from '@nestjs/passport';
+import { JwtStrategy } from './security/passport.jwt.strategy';
 
 @Module({
   imports: [
@@ -14,9 +16,10 @@ import { ConfigModule } from '@nestjs/config';
       secret: process.env.SECRET_KEY,
       signOptions: { expiresIn: '1d' }, // 토큰 유효기간 1일
     }),
+    PassportModule,
   ],
   exports: [TypeOrmModule],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, JwtStrategy],
 })
 export class AuthModule {}
