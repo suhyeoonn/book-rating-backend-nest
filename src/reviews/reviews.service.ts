@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Review } from './entities/review.entity';
 import { DataSource, Repository } from 'typeorm';
-import { GetReviewDto } from './dto/get-review.dto';
+import { GetReviewDto, ReviewDto } from './dto/get-review.dto';
 import { Book } from 'src/books/entities/book.entity';
 import { ReviewDeleteResponseDto } from './dto/delete-review.dto';
 
@@ -66,6 +66,17 @@ export class ReviewsService {
 
     await this.reviewRepository.delete(id);
     return { averageRating: await this.getAverageRating(bookId) };
+  }
+
+  async getMyReviewByBookId(
+    bookId: number,
+    userId: number,
+  ): Promise<ReviewDto> {
+    const result = await this.reviewRepository.findOne({
+      where: { bookId, userId },
+    });
+
+    return result;
   }
 
   private async validateReview(id: number) {

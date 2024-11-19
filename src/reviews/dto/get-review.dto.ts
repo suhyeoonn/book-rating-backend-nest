@@ -1,9 +1,9 @@
 export class GetReviewDto {
   bookId: number;
-  reviews: Review[];
+  reviews: ReviewDto[];
 }
 
-class Review {
+export class ReviewDto {
   id: number;
   rating: number;
   content: string;

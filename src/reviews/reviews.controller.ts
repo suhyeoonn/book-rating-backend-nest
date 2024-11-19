@@ -42,4 +42,14 @@ export class ReviewsController {
   remove(@Param('bookId') bookId: string, @Param('id') id: string) {
     return this.reviewsService.remove(+bookId, +id);
   }
+
+  @Get('/my-review')
+  @UseGuards(AuthGuard)
+  async hasUserReview(
+    @Param('bookId') bookId: string,
+    @Req() req: Request & { user: User },
+  ) {
+    const userId = req.user.id;
+    return await this.reviewsService.getMyReviewByBookId(+bookId, +userId);
+  }
 }
