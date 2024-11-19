@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   CreateReviewDto,
   ReviewCreateResponseDto,
@@ -6,9 +10,13 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Review } from './entities/review.entity';
 import { DataSource, Repository } from 'typeorm';
-import { GetReviewDto, ReviewDto } from './dto/get-review.dto';
+import { GetReviewDto, ReviewItemDto } from './dto/get-review.dto';
 import { Book } from 'src/books/entities/book.entity';
 import { ReviewDeleteResponseDto } from './dto/delete-review.dto';
+import {
+  ReviewUpdateResponseDto,
+  UpdateReviewDto,
+} from './dto/update-review.dto';
 
 @Injectable()
 export class ReviewsService {
@@ -61,17 +69,38 @@ export class ReviewsService {
     return { bookId, reviews: filteredReviews };
   }
 
-  async remove(bookId: number, id: number): Promise<ReviewDeleteResponseDto> {
-    await this.validateReview(id);
+  async remove(
+    bookId: number,
+    id: number,
+    userId: number,
+  ): Promise<ReviewDeleteResponseDto> {
+    await this.validateReview(id, userId);
 
     await this.reviewRepository.delete(id);
     return { averageRating: await this.getAverageRating(bookId) };
   }
 
+  async update(
+    bookId: number,
+    id: number,
+    userId: number,
+    reviewDto: UpdateReviewDto,
+  ): Promise<ReviewUpdateResponseDto> {
+    await this.validateReview(id, userId);
+
+    await this.reviewRepository.update(id, {
+      ...reviewDto,
+    });
+
+    return {
+      averageRating: await this.getAverageRating(bookId),
+    };
+  }
+
   async getMyReviewByBookId(
     bookId: number,
     userId: number,
-  ): Promise<ReviewDto> {
+  ): Promise<ReviewItemDto> {
     const result = await this.reviewRepository.findOne({
       where: { bookId, userId },
     });
@@ -79,10 +108,12 @@ export class ReviewsService {
     return result;
   }
 
-  private async validateReview(id: number) {
+  private async validateReview(id: number, userId: number) {
     const review = await this.reviewRepository.findOne({ where: { id } });
     if (!review) {
       throw new NotFoundException(`Review with ID ${id} not found`);
+    } else if (review.userId !== userId) {
+      throw new ForbiddenException();
     }
   }
 

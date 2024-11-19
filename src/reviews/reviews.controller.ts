@@ -9,6 +9,7 @@ import {
   UseInterceptors,
   UseGuards,
   Req,
+  Patch,
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -16,6 +17,7 @@ import { BookValidationInterceptor } from './interceptors/book-validation.interc
 import { AuthGuard } from 'src/auth/security/auth.guard';
 import { Request } from 'express';
 import { User } from 'src/auth/entity/user.entity';
+import { UpdateReviewDto } from './dto/update-review.dto';
 
 @UseInterceptors(BookValidationInterceptor)
 @Controller('/books/:bookId/reviews')
@@ -38,9 +40,27 @@ export class ReviewsController {
     return this.reviewsService.findAll(+bookId);
   }
 
+  @Patch(':id')
+  @UseGuards(AuthGuard)
+  update(
+    @Param('bookId') bookId: string,
+    @Param('id') id: string,
+    @Req() req: Request & { user: User },
+    @Body(new ValidationPipe()) reviewDto: UpdateReviewDto,
+  ) {
+    const userId = req.user.id;
+    return this.reviewsService.update(+bookId, +id, userId, reviewDto);
+  }
+
   @Delete(':id')
-  remove(@Param('bookId') bookId: string, @Param('id') id: string) {
-    return this.reviewsService.remove(+bookId, +id);
+  @UseGuards(AuthGuard)
+  remove(
+    @Param('bookId') bookId: string,
+    @Param('id') id: string,
+    @Req() req: Request & { user: User },
+  ) {
+    const userId = req.user.id;
+    return this.reviewsService.remove(+bookId, +id, userId);
   }
 
   @Get('/my-review')
