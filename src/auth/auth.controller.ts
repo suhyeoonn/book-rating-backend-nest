@@ -1,7 +1,18 @@
-import { Body, Controller, Post, Res, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserDto } from './dto/user.dto';
 import { Response } from 'express';
+import { AuthGuard } from './security/auth.guard';
+import { User } from './entity/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -39,5 +50,14 @@ export class AuthController {
     return res.send({
       message: 'success',
     });
+  }
+
+  /**
+   * JWT 토큰을 검증하고 사용자 정보를 반환
+   */
+  @Get('me')
+  @UseGuards(AuthGuard)
+  getProfile(@Req() req: Request & { user: User }) {
+    return req.user;
   }
 }
