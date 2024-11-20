@@ -11,11 +11,11 @@ export class UserDto {
 }
 
 export class LoginResponseDto {
-  user: User;
+  user: UserResponse;
   accessToken: string;
 }
 
-class User {
+export class UserResponse {
   id: number;
   username: string;
 }

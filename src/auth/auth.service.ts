@@ -40,12 +40,14 @@ export class AuthService {
       where: { username: userDto.username },
     });
 
+    if (!foundUser) throw new UnauthorizedException();
+
     const validatePassword = await bcrypt.compare(
       userDto.password,
       foundUser.password,
     );
 
-    if (!foundUser || !validatePassword) {
+    if (!validatePassword) {
       throw new UnauthorizedException();
     }
 

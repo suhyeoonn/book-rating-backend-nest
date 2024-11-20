@@ -9,7 +9,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { UserDto } from './dto/user.dto';
+import { UserDto, UserResponse } from './dto/user.dto';
 import { Response } from 'express';
 import { AuthGuard } from './security/auth.guard';
 import { User } from './entity/user.entity';
@@ -57,7 +57,7 @@ export class AuthController {
    */
   @Get('me')
   @UseGuards(AuthGuard)
-  getProfile(@Req() req: Request & { user: User }) {
+  getProfile(@Req() req: Request & { user: User }): UserResponse {
     return req.user;
   }
 }

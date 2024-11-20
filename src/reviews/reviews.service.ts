@@ -1,8 +1,4 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import {
   CreateReviewDto,
   ReviewCreateResponseDto,
@@ -69,13 +65,7 @@ export class ReviewsService {
     return { bookId, reviews: filteredReviews };
   }
 
-  async remove(
-    bookId: number,
-    id: number,
-    userId: number,
-  ): Promise<ReviewDeleteResponseDto> {
-    await this.validateReview(id, userId);
-
+  async remove(bookId: number, id: number): Promise<ReviewDeleteResponseDto> {
     await this.reviewRepository.delete(id);
     return { averageRating: await this.getAverageRating(bookId) };
   }
@@ -83,11 +73,8 @@ export class ReviewsService {
   async update(
     bookId: number,
     id: number,
-    userId: number,
     reviewDto: UpdateReviewDto,
   ): Promise<ReviewUpdateResponseDto> {
-    await this.validateReview(id, userId);
-
     await this.reviewRepository.update(id, {
       ...reviewDto,
     });
@@ -106,15 +93,6 @@ export class ReviewsService {
     });
 
     return result;
-  }
-
-  private async validateReview(id: number, userId: number) {
-    const review = await this.reviewRepository.findOne({ where: { id } });
-    if (!review) {
-      throw new NotFoundException(`Review with ID ${id} not found`);
-    } else if (review.userId !== userId) {
-      throw new ForbiddenException();
-    }
   }
 
   private async getAverageRating(bookId: number) {

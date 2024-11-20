@@ -10,6 +10,7 @@ import {
   UseGuards,
   Req,
   Patch,
+  HttpStatus,
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -18,13 +19,17 @@ import { AuthGuard } from 'src/auth/security/auth.guard';
 import { Request } from 'express';
 import { User } from 'src/auth/entity/user.entity';
 import { UpdateReviewDto } from './dto/update-review.dto';
-import { ApiCookieAuth } from '@nestjs/swagger';
+import { ApiBody, ApiCookieAuth, ApiResponse } from '@nestjs/swagger';
+import { ReviewValidationInterceptor } from './interceptors/review-validation.interceptor';
 
+@ApiResponse({
+  status: HttpStatus.NOT_FOUND,
+  description: 'Book not found.',
+})
 @UseInterceptors(BookValidationInterceptor)
 @Controller('/books/:bookId/reviews')
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
-
   /**
    * 책 리뷰 목록 조회
    */
@@ -53,15 +58,20 @@ export class ReviewsController {
    */
   @Patch(':id')
   @ApiCookieAuth()
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Book or Review not found.',
+  })
+  @ApiBody({ type: UpdateReviewDto })
   @UseGuards(AuthGuard)
+  @UseInterceptors(ReviewValidationInterceptor)
   update(
     @Param('bookId') bookId: string,
     @Param('id') id: string,
-    @Req() req: Request & { user: User },
     @Body(new ValidationPipe()) reviewDto: UpdateReviewDto,
   ) {
-    const userId = req.user.id;
-    return this.reviewsService.update(+bookId, +id, userId, reviewDto);
+    return this.reviewsService.update(+bookId, +id, reviewDto);
   }
 
   /**
@@ -69,14 +79,15 @@ export class ReviewsController {
    */
   @Delete(':id')
   @ApiCookieAuth()
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Book or Review not found.',
+  })
   @UseGuards(AuthGuard)
-  remove(
-    @Param('bookId') bookId: string,
-    @Param('id') id: string,
-    @Req() req: Request & { user: User },
-  ) {
-    const userId = req.user.id;
-    return this.reviewsService.remove(+bookId, +id, userId);
+  @UseInterceptors(ReviewValidationInterceptor)
+  remove(@Param('bookId') bookId: string, @Param('id') id: string) {
+    return this.reviewsService.remove(+bookId, +id);
   }
 
   /**
