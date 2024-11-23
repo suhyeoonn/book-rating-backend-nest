@@ -14,4 +14,19 @@ export class Book {
 
   @Column()
   thumbnail: string;
+
+  @Column({ type: 'text' })
+  contents: string;
+
+  @Column({ type: 'timestamp' })
+  datetime: Date;
+
+  @Column()
+  url: string;
+
+  @Column()
+  authors: string;
+
+  @Column()
+  publisher: string;
 }

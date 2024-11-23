@@ -11,6 +11,7 @@ import { DataSource, Repository } from 'typeorm';
 import { throwIfEmpty } from 'rxjs';
 import { GetBooksDto } from './dto/get-books.dto';
 import { Review } from 'src/reviews/entities/review.entity';
+import { GetBookDto } from './dto/get-book.dto';
 
 @Injectable()
 export class BooksService {
@@ -42,7 +43,8 @@ export class BooksService {
     const result = await this.dataSource.query(
       `
       SELECT 
-        book.id, isbn, title, thumbnail, IFNULL(Round(AVG(rating), 0), 0) as averageRating, COUNT(rating) as reviewCount 
+        book.id, isbn, title, thumbnail, 
+        IFNULL(Round(AVG(rating), 0), 0) as averageRating, COUNT(rating) as reviewCount 
       FROM book 
       LEFT JOIN review ON review.bookId = book.id 
       GROUP BY book.id`,
@@ -54,13 +56,14 @@ export class BooksService {
     }));
   }
 
-  async findOne(id: number): Promise<GetBooksDto> {
+  async findOne(id: number): Promise<GetBookDto> {
     await this.validateBook(id);
 
     const result = await this.dataSource.query(
       `
       SELECT 
-        book.id, isbn, title, thumbnail, IFNULL(Round(AVG(rating), 0), 0) as averageRating 
+        book.id, isbn, title, thumbnail, contents, datetime, url, authors, publisher, 
+        IFNULL(Round(AVG(rating), 0), 0) as averageRating 
       FROM book 
       LEFT JOIN review ON review.bookId = book.id 
       WHERE book.id = ${id}

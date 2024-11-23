@@ -1,4 +1,4 @@
-import { IsISBN, IsString } from 'class-validator';
+import { IsDateString, IsISBN, IsString } from 'class-validator';
 
 export class CreateBookDto {
   @IsISBN()
@@ -9,4 +9,16 @@ export class CreateBookDto {
 
   @IsString()
   thumbnail: string;
+
+  @IsString()
+  contents: string;
+
+  @IsDateString()
+  datetime: string;
+
+  @IsString()
+  authors: string;
+
+  @IsString()
+  publisher: string;
 }
