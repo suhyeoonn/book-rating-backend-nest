@@ -42,7 +42,7 @@ export class BooksService {
     const result = await this.dataSource.query(
       `
       SELECT 
-        book.id, isbn, title, thumbnail, IFNULL(Round(AVG(rating), 0), 0) as averageRating 
+        book.id, isbn, title, thumbnail, IFNULL(Round(AVG(rating), 0), 0) as averageRating, COUNT(rating) as reviewCount 
       FROM book 
       LEFT JOIN review ON review.bookId = book.id 
       GROUP BY book.id`,
@@ -54,8 +54,22 @@ export class BooksService {
     }));
   }
 
-  findOne(id: number) {
-    return this.bookRepository.findOne({ where: { id } });
+  async findOne(id: number): Promise<GetBooksDto> {
+    await this.validateBook(id);
+
+    const result = await this.dataSource.query(
+      `
+      SELECT 
+        book.id, isbn, title, thumbnail, IFNULL(Round(AVG(rating), 0), 0) as averageRating 
+      FROM book 
+      LEFT JOIN review ON review.bookId = book.id 
+      WHERE book.id = ${id}
+      GROUP BY book.id`,
+    );
+
+    const book = result[0];
+
+    return { ...book };
   }
 
   async remove(id: number) {

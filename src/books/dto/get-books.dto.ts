@@ -4,4 +4,5 @@ export class GetBooksDto {
   title: string;
   thumbnail: string;
   averageRating: number;
+  reviewCount: number;
 }

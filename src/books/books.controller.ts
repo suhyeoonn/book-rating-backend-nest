@@ -23,6 +23,14 @@ export class BooksController {
   }
 
   /**
+   * 책 조회
+   */
+  @Get(':id')
+  async find(@Param('id') id: string) {
+    return this.booksService.findOne(+id);
+  }
+
+  /**
    * 책 등록
    */
   // TODO: 사용자 인증
