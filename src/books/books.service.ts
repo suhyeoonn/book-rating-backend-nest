@@ -8,7 +8,6 @@ import { CreateBookDto } from './dto/create-book.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Book } from './entities/book.entity';
 import { DataSource, Repository } from 'typeorm';
-import { throwIfEmpty } from 'rxjs';
 import { GetBooksDto } from './dto/get-books.dto';
 import { Review } from 'src/reviews/entities/review.entity';
 import { GetBookDto } from './dto/get-book.dto';
@@ -23,7 +22,7 @@ export class BooksService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async create(createBookDto: CreateBookDto) {
+  async create(createBookDto: CreateBookDto): Promise<Book> {
     const { isbn } = createBookDto;
 
     const isExist = await this.bookRepository.findOne({
@@ -34,8 +33,12 @@ export class BooksService {
       throw new ConflictException(`ISBN ${isbn} already exists.`);
     }
 
-    this.bookRepository.save(createBookDto).then(() => throwIfEmpty());
-    return 'This action adds a new book';
+    const savedBook = await this.bookRepository.save(createBookDto);
+    if (!savedBook) {
+      throw new Error('Failed to save the book.');
+    }
+
+    return savedBook;
   }
 
   async findAll(): Promise<GetBooksDto[]> {

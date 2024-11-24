@@ -21,7 +21,7 @@ export class Book {
   @Column({ type: 'timestamp' })
   datetime: Date;
 
-  @Column()
+  @Column({ type: 'text' })
   url: string;
 
   @Column()
