@@ -1,10 +1,8 @@
 import {
   BadRequestException,
-  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateBookDto } from './dto/create-book.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Book } from './entities/book.entity';
 import { DataSource, Repository } from 'typeorm';
@@ -21,25 +19,6 @@ export class BooksService {
     private reviewRepository: Repository<Review>,
     private readonly dataSource: DataSource,
   ) {}
-
-  async create(createBookDto: CreateBookDto): Promise<Book> {
-    const { isbn } = createBookDto;
-
-    const isExist = await this.bookRepository.findOne({
-      where: { isbn: createBookDto.isbn },
-    });
-
-    if (isExist) {
-      throw new ConflictException(`ISBN ${isbn} already exists.`);
-    }
-
-    const savedBook = await this.bookRepository.save(createBookDto);
-    if (!savedBook) {
-      throw new Error('Failed to save the book.');
-    }
-
-    return savedBook;
-  }
 
   async findAll(): Promise<GetBooksDto[]> {
     // 책 정보와 평균 점수 조회

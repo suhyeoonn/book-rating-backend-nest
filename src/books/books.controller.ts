@@ -1,14 +1,5 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Delete,
-  ValidationPipe,
-} from '@nestjs/common';
+import { Controller, Get, Param, Delete } from '@nestjs/common';
 import { BooksService } from './books.service';
-import { CreateBookDto } from './dto/create-book.dto';
 
 @Controller('books')
 export class BooksController {
@@ -28,15 +19,6 @@ export class BooksController {
   @Get(':id')
   async find(@Param('id') id: string) {
     return this.booksService.findOne(+id);
-  }
-
-  /**
-   * 책 등록
-   */
-  // TODO: 사용자 인증
-  @Post()
-  create(@Body(new ValidationPipe()) createBookDto: CreateBookDto) {
-    return this.booksService.create(createBookDto);
   }
 
   /**

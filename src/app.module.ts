@@ -7,6 +7,8 @@ import { ReviewsModule } from './reviews/reviews.module';
 import { Review } from './reviews/entities/review.entity';
 import { AuthModule } from './auth/auth.module';
 import { User } from './auth/entity/user.entity';
+import { UserBooksModule } from './user-books/user-books.module';
+import { UserBook } from './user-books/entities/user-book.entity';
 
 @Module({
   imports: [
@@ -18,12 +20,13 @@ import { User } from './auth/entity/user.entity';
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE,
-      entities: [Book, Review, User],
+      entities: [Book, Review, User, UserBook],
       synchronize: true,
     }),
     BooksModule,
     ReviewsModule,
     AuthModule,
+    UserBooksModule,
   ],
 })
 export class AppModule {}
