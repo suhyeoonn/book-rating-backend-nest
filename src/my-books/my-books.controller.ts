@@ -10,14 +10,16 @@ import {
   ValidationPipe,
   Req,
 } from '@nestjs/common';
-import { UserBooksService } from './user-books.service';
-import { CreateUserBookDto } from './dto/create-user-book.dto';
-import { UpdateUserBookDto } from './dto/update-user-book.dto';
+import { UserBooksService } from './my-books.service';
+import { CreateUserBookDto } from './dto/create-my-book.dto';
+import { UpdateUserBookDto } from './dto/update-my-book.dto';
 import { User } from 'src/auth/entity/user.entity';
 import { AuthGuard } from 'src/auth/security/auth.guard';
+import { ApiCookieAuth } from '@nestjs/swagger';
 
-@Controller('user-books')
-export class UserBooksController {
+@Controller('my-books')
+@ApiCookieAuth()
+export class MyBooksController {
   constructor(private readonly userBooksService: UserBooksService) {}
 
   /**
@@ -33,6 +35,9 @@ export class UserBooksController {
     return this.userBooksService.create(createUserBookDto, userId);
   }
 
+  /**
+   * 책 목록 조회
+   */
   @Get()
   @UseGuards(AuthGuard)
   findAll(@Req() req: Request & { user: User }) {

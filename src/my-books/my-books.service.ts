@@ -1,6 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
-import { CreateUserBookDto } from './dto/create-user-book.dto';
-import { UpdateUserBookDto } from './dto/update-user-book.dto';
+import { CreateResponseDto, CreateUserBookDto } from './dto/create-my-book.dto';
+import { UpdateUserBookDto } from './dto/update-my-book.dto';
 import { Book } from 'src/books/entities/book.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -15,7 +15,10 @@ export class UserBooksService {
     private userBookRepository: Repository<UserBook>,
   ) {}
 
-  async create(createBookDto: CreateUserBookDto, userId: number) {
+  async create(
+    createBookDto: CreateUserBookDto,
+    userId: number,
+  ): Promise<CreateResponseDto> {
     let book = await this.bookRepository.findOne({
       where: { isbn: createBookDto.isbn },
     });
@@ -38,7 +41,7 @@ export class UserBooksService {
       userId,
       book,
     });
-    return userBook;
+    return { id: userBook.id };
   }
 
   async findAll(userId: number) {

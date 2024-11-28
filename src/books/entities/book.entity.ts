@@ -1,4 +1,4 @@
-import { UserBook } from 'src/user-books/entities/user-book.entity';
+import { UserBook } from 'src/my-books/entities/user-book.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()

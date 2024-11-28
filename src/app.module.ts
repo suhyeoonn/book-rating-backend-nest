@@ -7,8 +7,8 @@ import { ReviewsModule } from './reviews/reviews.module';
 import { Review } from './reviews/entities/review.entity';
 import { AuthModule } from './auth/auth.module';
 import { User } from './auth/entity/user.entity';
-import { UserBooksModule } from './user-books/user-books.module';
-import { UserBook } from './user-books/entities/user-book.entity';
+import { UserBooksModule } from './my-books/my-books.module';
+import { UserBook } from './my-books/entities/user-book.entity';
 
 @Module({
   imports: [
