@@ -5,6 +5,7 @@ import { Book } from 'src/books/entities/book.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserBook } from './entities/user-book.entity';
+import { GetMyBooks } from './dto/get-my-books.dto';
 
 @Injectable()
 export class UserBooksService {
@@ -44,10 +45,19 @@ export class UserBooksService {
     return { id: userBook.id };
   }
 
-  async findAll(userId: number) {
+  async findAll(userId: number): Promise<GetMyBooks[]> {
     return await this.userBookRepository
       .createQueryBuilder('userBook')
       .leftJoinAndSelect('userBook.book', 'book') // book 테이블 조인
+      .select([
+        'userBook.id',
+        'userBook.rating',
+        'userBook.status',
+        'userBook.createdAt',
+        'userBook.updatedAt',
+        'userBook.finishedAt',
+        'book.title',
+      ]) // 필요한 필드만 선택
       .where('userBook.userId = :userId', { userId })
       .getMany();
   }
