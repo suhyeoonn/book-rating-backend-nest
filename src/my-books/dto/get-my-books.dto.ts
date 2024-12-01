@@ -29,6 +29,9 @@ export class GetMyBooks {
 }
 
 class Book {
+  @ApiProperty({ example: '1' })
+  id: number;
+
   @ApiProperty({ example: '개발자 원칙' })
   title: string;
 }

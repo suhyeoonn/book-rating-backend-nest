@@ -45,6 +45,9 @@ export class MyBooksController {
     return this.userBooksService.findAll(userId);
   }
 
+  /**
+   * 단일 책 상세 조회
+   */
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.userBooksService.findOne(+id);

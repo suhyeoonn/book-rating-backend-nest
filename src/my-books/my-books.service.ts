@@ -48,7 +48,7 @@ export class UserBooksService {
   async findAll(userId: number): Promise<GetMyBooks[]> {
     return await this.userBookRepository
       .createQueryBuilder('userBook')
-      .leftJoinAndSelect('userBook.book', 'book') // book 테이블 조인
+      .leftJoinAndSelect('userBook.book', 'book')
       .select([
         'userBook.id',
         'userBook.rating',
@@ -56,14 +56,18 @@ export class UserBooksService {
         'userBook.createdAt',
         'userBook.updatedAt',
         'userBook.finishedAt',
+        'book.id',
         'book.title',
-      ]) // 필요한 필드만 선택
+      ])
       .where('userBook.userId = :userId', { userId })
       .getMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} userBook`;
+  async findOne(id: number) {
+    return await this.userBookRepository.findOne({
+      where: { id },
+      relations: ['book'],
+    });
   }
 
   update(id: number, updateUserBookDto: UpdateUserBookDto) {
