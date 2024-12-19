@@ -48,7 +48,7 @@ export class AuthController {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000, // 1d
     });
-    return res.send({ user: result.user });
+    return res.send({ user: result.user, token: result.accessToken });
   }
 
   /**
@@ -70,7 +70,11 @@ export class AuthController {
    */
   @Get('me')
   @UseGuards(AuthGuard)
-  getProfile(@Req() req: Request & { user: User }): UserResponse {
-    return req.user;
+  getProfile(
+    @Req() req: Request & { user: User; cookies: { [key: string]: string } },
+  ) {
+    const user = req.user;
+    const token = req.cookies['jwt'];
+    return { user, token };
   }
 }
