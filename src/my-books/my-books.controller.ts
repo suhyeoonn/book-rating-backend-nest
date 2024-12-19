@@ -9,6 +9,7 @@ import {
   UseGuards,
   ValidationPipe,
   Req,
+  Query,
 } from '@nestjs/common';
 import { UserBooksService } from './my-books.service';
 import { CreateUserBookDto } from './dto/create-my-book.dto';
@@ -43,6 +44,19 @@ export class MyBooksController {
   findAll(@Req() req: Request & { user: User }) {
     const userId = req.user.id;
     return this.userBooksService.findAll(userId);
+  }
+
+  /**
+   * 책이 내 리스트에 등록되어 있는지 확인
+   */
+  @Get('exists')
+  @UseGuards(AuthGuard)
+  isBookInMyList(
+    @Query('isbn') isbn: string,
+    @Req() req: Request & { user: User },
+  ) {
+    const userId = req.user.id;
+    return this.userBooksService.isBookInMyList(isbn, userId);
   }
 
   /**

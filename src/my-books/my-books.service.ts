@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateResponseDto, CreateUserBookDto } from './dto/create-my-book.dto';
 import { UpdateUserBookDto } from './dto/update-my-book.dto';
 import { Book } from 'src/books/entities/book.entity';
@@ -76,5 +80,22 @@ export class UserBooksService {
 
   remove(id: number) {
     return `This action removes a #${id} userBook`;
+  }
+
+  async isBookInMyList(
+    isbn: string,
+    userId: number,
+  ): Promise<{ exists: boolean }> {
+    const book = await this.bookRepository.findOne({ where: { isbn } });
+    if (!book) throw new NotFoundException();
+
+    const exists = await this.userBookRepository.findOne({
+      where: {
+        userId,
+        book: { id: book.id },
+      },
+    });
+
+    return { exists: !!exists };
   }
 }
