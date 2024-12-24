@@ -67,7 +67,7 @@ export class MyBooksController {
     return this.userBooksService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Patch(':id/review')
   update(
     @Param('id') id: string,
     @Body() updateUserBookDto: UpdateUserBookDto,

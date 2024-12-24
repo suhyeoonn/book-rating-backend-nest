@@ -74,8 +74,11 @@ export class UserBooksService {
     });
   }
 
-  update(id: number, updateUserBookDto: UpdateUserBookDto) {
-    return `This action updates a #${id} userBook`;
+  async update(id: number, updateUserBookDto: UpdateUserBookDto) {
+    return await this.userBookRepository.update(
+      { id },
+      { review: updateUserBookDto.review },
+    );
   }
 
   remove(id: number) {

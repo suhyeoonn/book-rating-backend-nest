@@ -1,4 +1,8 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateUserBookDto } from './create-my-book.dto';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsString } from 'class-validator';
 
-export class UpdateUserBookDto extends PartialType(CreateUserBookDto) {}
+export class UpdateUserBookDto {
+  @IsString()
+  @ApiProperty({ example: '책 리뷰' })
+  review: string;
+}
