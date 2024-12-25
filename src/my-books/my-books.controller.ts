@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { UserBooksService } from './my-books.service';
 import { CreateUserBookDto } from './dto/create-my-book.dto';
-import { UpdateUserBookDto } from './dto/update-my-book.dto';
+import { UpdateReviewDto, UpdateStatusDto } from './dto/update-my-book.dto';
 import { User } from 'src/auth/entity/user.entity';
 import { AuthGuard } from 'src/auth/security/auth.guard';
 import { ApiCookieAuth } from '@nestjs/swagger';
@@ -67,12 +67,23 @@ export class MyBooksController {
     return this.userBooksService.findOne(+id);
   }
 
+  /**
+   * 리뷰 수정
+   */
   @Patch(':id/review')
-  update(
+  reviewUpdate(
     @Param('id') id: string,
-    @Body() updateUserBookDto: UpdateUserBookDto,
+    @Body() updateUserBookDto: UpdateReviewDto,
   ) {
-    return this.userBooksService.update(+id, updateUserBookDto);
+    return this.userBooksService.updateReview(+id, updateUserBookDto);
+  }
+
+  /**
+   * 상태 수정
+   */
+  @Patch(':id/status')
+  statusUpdate(@Param('id') id: string, @Body() updateDto: UpdateStatusDto) {
+    return this.userBooksService.updateStatus(+id, updateDto);
   }
 
   @Delete(':id')

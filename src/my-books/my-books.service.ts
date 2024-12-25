@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateResponseDto, CreateUserBookDto } from './dto/create-my-book.dto';
-import { UpdateUserBookDto } from './dto/update-my-book.dto';
+import { UpdateReviewDto, UpdateStatusDto } from './dto/update-my-book.dto';
 import { Book } from 'src/books/entities/book.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -74,10 +74,17 @@ export class UserBooksService {
     });
   }
 
-  async update(id: number, updateUserBookDto: UpdateUserBookDto) {
+  async updateReview(id: number, updateUserBookDto: UpdateReviewDto) {
     return await this.userBookRepository.update(
       { id },
       { review: updateUserBookDto.review },
+    );
+  }
+
+  async updateStatus(id: number, updateDto: UpdateStatusDto) {
+    return await this.userBookRepository.update(
+      { id },
+      { status: updateDto.status },
     );
   }
 
