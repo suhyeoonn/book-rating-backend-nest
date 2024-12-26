@@ -98,7 +98,11 @@ export class MyBooksController {
     return this.userBooksService.updateRating(+id, updateDto);
   }
 
+  /**
+   * 책 삭제
+   */
   @Delete(':id')
+  @UseGuards(AuthGuard) // TODO: my-books 전체에 가드하는 법 없나?
   remove(@Param('id') id: string) {
     return this.userBooksService.remove(+id);
   }
