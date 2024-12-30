@@ -1,4 +1,5 @@
 import { UserBook } from 'src/my-books/entities/user-book.entity';
+import { Review } from 'src/reviews/entities/review.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
@@ -33,4 +34,8 @@ export class Book {
 
   @OneToMany(() => UserBook, (userBook) => userBook.book)
   userBooks: UserBook[];
+
+  // 하나의 책은 여러 Review와 관계
+  @OneToMany(() => Review, (review) => review.book)
+  reviews: Review[];
 }

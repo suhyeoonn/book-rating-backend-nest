@@ -4,8 +4,10 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   JoinColumn,
+  OneToOne,
 } from 'typeorm';
 import { Book } from '../../books/entities/book.entity';
+import { Review } from 'src/reviews/entities/review.entity';
 
 @Entity()
 export class UserBook {
@@ -20,12 +22,18 @@ export class UserBook {
   @JoinColumn({ name: 'bookId' })
   book: Book;
 
+  // 하나의 UserBook은 하나의 Review와 연결
+  @OneToOne(() => Review, (review) => review.userBook, { nullable: true })
+  @JoinColumn({ name: 'reviewId' })
+  review: Review;
+
   @Column({ type: 'tinyint', default: 0 })
   status: number;
 
   @Column({ type: 'text', nullable: true })
-  review: string;
+  memo: string;
 
+  // TODO: 제거
   @Column({ type: 'tinyint', default: 0 })
   rating: number;
 

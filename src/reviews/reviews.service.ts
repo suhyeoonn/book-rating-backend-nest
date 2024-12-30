@@ -13,6 +13,7 @@ import {
   ReviewUpdateResponseDto,
   UpdateReviewDto,
 } from './dto/update-review.dto';
+import { UserBook } from 'src/my-books/entities/user-book.entity';
 
 @Injectable()
 export class ReviewsService {
@@ -21,6 +22,8 @@ export class ReviewsService {
     private reviewRepository: Repository<Review>,
     @InjectRepository(Book)
     private bookRepository: Repository<Book>,
+    @InjectRepository(UserBook)
+    private userBookRepository: Repository<UserBook>,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -36,6 +39,15 @@ export class ReviewsService {
       rating,
       userId,
     });
+
+    const userBook = await this.userBookRepository.findOne({
+      where: { userId, book: { id: bookId } },
+    });
+
+    await this.userBookRepository.update(
+      { id: userBook.id },
+      { review: { id: savedReview.id } },
+    );
 
     return {
       review: savedReview,

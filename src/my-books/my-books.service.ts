@@ -74,14 +74,15 @@ export class UserBooksService {
   async findOne(id: number) {
     return await this.userBookRepository.findOne({
       where: { id },
-      relations: ['book'],
+      relations: ['book', 'review'],
     });
   }
 
+  // TODO: memo로 변경
   async updateReview(id: number, updateUserBookDto: UpdateReviewDto) {
     return await this.userBookRepository.update(
       { id },
-      { review: updateUserBookDto.review },
+      { memo: updateUserBookDto.review },
     );
   }
 
