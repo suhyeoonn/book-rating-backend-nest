@@ -11,14 +11,15 @@ import {
   Req,
   Patch,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
-import { BookValidationInterceptor } from './interceptors/book-validation.interceptor';
+// import { BookValidationInterceptor } from './interceptors/book-validation.interceptor';
 import { AuthGuard } from 'src/auth/security/auth.guard';
 import { Request } from 'express';
 import { User } from 'src/auth/entity/user.entity';
-import { UpdateReviewDto } from './dto/update-review.dto';
+import { UpdateRatingDto, UpdateReviewDto } from './dto/update-review.dto';
 import { ApiBody, ApiCookieAuth, ApiResponse } from '@nestjs/swagger';
 import { ReviewValidationInterceptor } from './interceptors/review-validation.interceptor';
 
@@ -26,15 +27,15 @@ import { ReviewValidationInterceptor } from './interceptors/review-validation.in
   status: HttpStatus.NOT_FOUND,
   description: 'Book not found.',
 })
-@UseInterceptors(BookValidationInterceptor)
-@Controller('/books/:bookId/reviews')
+// @UseInterceptors(BookValidationInterceptor) //TODO: 제거?
+@Controller('reviews')
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
   /**
    * 책 리뷰 목록 조회
    */
   @Get()
-  async findAll(@Param('bookId') bookId: string) {
+  async findAll(@Query('bookId') bookId: string) {
     return this.reviewsService.findAll(+bookId);
   }
 
@@ -51,6 +52,14 @@ export class ReviewsController {
   ) {
     const userId = req.user.id;
     return this.reviewsService.create(+bookId, createReviewDto, userId);
+  }
+
+  /**
+   * 별점 수정
+   */
+  @Patch(':id/rating')
+  ratingUpdate(@Param('id') id: string, @Body() updateDto: UpdateRatingDto) {
+    return this.reviewsService.updateRating(+id, updateDto);
   }
 
   /**

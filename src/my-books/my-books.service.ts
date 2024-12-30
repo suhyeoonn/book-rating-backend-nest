@@ -4,11 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateResponseDto, CreateUserBookDto } from './dto/create-my-book.dto';
-import {
-  UpdateRatingDto,
-  UpdateReviewDto,
-  UpdateStatusDto,
-} from './dto/update-my-book.dto';
+import { UpdateReviewDto, UpdateStatusDto } from './dto/update-my-book.dto';
 import { Book } from 'src/books/entities/book.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -54,21 +50,35 @@ export class UserBooksService {
   }
 
   async findAll(userId: number): Promise<GetMyBooks[]> {
-    return await this.userBookRepository
+    const result = await this.userBookRepository
       .createQueryBuilder('userBook')
       .leftJoinAndSelect('userBook.book', 'book')
+      .leftJoinAndSelect('userBook.review', 'review')
       .select([
         'userBook.id',
-        'userBook.rating',
         'userBook.status',
         'userBook.createdAt',
         'userBook.updatedAt',
         'userBook.finishedAt',
         'book.id',
         'book.title',
+        'review.rating',
       ])
       .where('userBook.userId = :userId', { userId })
-      .getMany();
+      .getRawMany();
+
+    return result.map((row) => ({
+      id: row.userBook_id,
+      status: row.userBook_status,
+      createdAt: row.userBook_createdAt,
+      updatedAt: row.userBook_updatedAt,
+      finishedAt: row.userBook_finishedAt,
+      book: {
+        id: row.book_id,
+        title: row.book_title,
+      },
+      rating: row.review_rating,
+    }));
   }
 
   async findOne(id: number) {
@@ -90,13 +100,6 @@ export class UserBooksService {
     return await this.userBookRepository.update(
       { id },
       { status: updateDto.status },
-    );
-  }
-
-  async updateRating(id: number, updateDto: UpdateRatingDto) {
-    return await this.userBookRepository.update(
-      { id },
-      { rating: updateDto.rating },
     );
   }
 

@@ -11,6 +11,7 @@ import { Book } from 'src/books/entities/book.entity';
 import { ReviewDeleteResponseDto } from './dto/delete-review.dto';
 import {
   ReviewUpdateResponseDto,
+  UpdateRatingDto,
   UpdateReviewDto,
 } from './dto/update-review.dto';
 import { UserBook } from 'src/my-books/entities/user-book.entity';
@@ -94,6 +95,13 @@ export class ReviewsService {
     return {
       averageRating: await this.getAverageRating(bookId),
     };
+  }
+
+  async updateRating(id: number, updateDto: UpdateRatingDto) {
+    return await this.reviewRepository.update(
+      { id },
+      { rating: updateDto.rating },
+    );
   }
 
   async getMyReviewByBookId(

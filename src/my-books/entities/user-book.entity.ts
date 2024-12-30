@@ -33,10 +33,6 @@ export class UserBook {
   @Column({ type: 'text', nullable: true })
   memo: string;
 
-  // TODO: 제거
-  @Column({ type: 'tinyint', default: 0 })
-  rating: number;
-
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
