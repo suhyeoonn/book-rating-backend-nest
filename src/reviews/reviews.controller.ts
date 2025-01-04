@@ -19,7 +19,7 @@ import { CreateReviewDto } from './dto/create-review.dto';
 import { AuthGuard } from 'src/auth/security/auth.guard';
 import { Request } from 'express';
 import { User } from 'src/auth/entity/user.entity';
-import { UpdateRatingDto, UpdateReviewDto } from './dto/update-review.dto';
+import { UpdateRatingDto, UpdateCommentDto } from './dto/update-review.dto';
 import { ApiBody, ApiCookieAuth, ApiResponse } from '@nestjs/swagger';
 import { ReviewValidationInterceptor } from './interceptors/review-validation.interceptor';
 
@@ -63,24 +63,23 @@ export class ReviewsController {
   }
 
   /**
-   * 책 리뷰 수정
+   * 한줄평 수정
    */
-  @Patch(':id')
+  @Patch(':id/comment')
   @ApiCookieAuth()
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: 'Book or Review not found.',
+    description: 'Review not found.',
   })
-  @ApiBody({ type: UpdateReviewDto })
+  @ApiBody({ type: UpdateCommentDto })
   @UseGuards(AuthGuard)
   @UseInterceptors(ReviewValidationInterceptor)
   update(
-    @Param('bookId') bookId: string,
     @Param('id') id: string,
-    @Body(new ValidationPipe()) reviewDto: UpdateReviewDto,
+    @Body(new ValidationPipe()) reviewDto: UpdateCommentDto,
   ) {
-    return this.reviewsService.update(+bookId, +id, reviewDto);
+    return this.reviewsService.updateComment(+id, reviewDto);
   }
 
   /**

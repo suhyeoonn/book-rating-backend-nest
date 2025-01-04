@@ -1,9 +1,12 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { CreateReviewDto } from './create-review.dto';
+import { ApiProperty } from '@nestjs/swagger';
 import { ReviewDeleteResponseDto } from './delete-review.dto';
-import { IsNumber, Max, Min } from 'class-validator';
+import { IsNumber, IsString, Max, Min, MinLength } from 'class-validator';
 
-export class UpdateReviewDto extends PartialType(CreateReviewDto) {}
+export class UpdateCommentDto {
+  @IsString()
+  @MinLength(1)
+  content: string;
+}
 export class ReviewUpdateResponseDto extends ReviewDeleteResponseDto {}
 
 export class UpdateRatingDto {

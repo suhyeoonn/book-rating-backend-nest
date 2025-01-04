@@ -9,11 +9,7 @@ import { DataSource, Repository } from 'typeorm';
 import { GetReviewDto, ReviewItemDto } from './dto/get-review.dto';
 import { Book } from 'src/books/entities/book.entity';
 import { ReviewDeleteResponseDto } from './dto/delete-review.dto';
-import {
-  ReviewUpdateResponseDto,
-  UpdateRatingDto,
-  UpdateReviewDto,
-} from './dto/update-review.dto';
+import { UpdateRatingDto, UpdateCommentDto } from './dto/update-review.dto';
 import { UserBook } from 'src/my-books/entities/user-book.entity';
 
 @Injectable()
@@ -83,18 +79,10 @@ export class ReviewsService {
     return { averageRating: await this.getAverageRating(bookId) };
   }
 
-  async update(
-    bookId: number,
-    id: number,
-    reviewDto: UpdateReviewDto,
-  ): Promise<ReviewUpdateResponseDto> {
-    await this.reviewRepository.update(id, {
+  async updateComment(id: number, reviewDto: UpdateCommentDto) {
+    return await this.reviewRepository.update(id, {
       ...reviewDto,
     });
-
-    return {
-      averageRating: await this.getAverageRating(bookId),
-    };
   }
 
   async updateRating(id: number, updateDto: UpdateRatingDto) {
