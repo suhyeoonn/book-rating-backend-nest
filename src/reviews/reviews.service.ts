@@ -74,6 +74,10 @@ export class ReviewsService {
     return { bookId, reviews: filteredReviews };
   }
 
+  async find(reviewId: number) {
+    return await this.reviewRepository.findOne({ where: { id: reviewId } });
+  }
+
   async remove(bookId: number, id: number): Promise<ReviewDeleteResponseDto> {
     await this.reviewRepository.delete(id);
     return { averageRating: await this.getAverageRating(bookId) };

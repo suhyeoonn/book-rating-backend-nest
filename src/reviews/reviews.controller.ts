@@ -40,6 +40,14 @@ export class ReviewsController {
   }
 
   /**
+   * 책 리뷰 단일 조회
+   */
+  @Get(':id')
+  async find(@Param('id') id: string) {
+    return this.reviewsService.find(+id);
+  }
+
+  /**
    * 책 리뷰 등록
    */
   @Post()
