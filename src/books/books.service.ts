@@ -20,7 +20,7 @@ export class BooksService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async findAll(): Promise<GetBooksDto[]> {
+  async findAll(title?: string): Promise<GetBooksDto[]> {
     // 책 정보와 평균 점수 조회
     const result = await this.dataSource.query(
       `
@@ -29,7 +29,9 @@ export class BooksService {
         IFNULL(Round(AVG(rating), 0), 0) as averageRating, COUNT(rating) as reviewCount 
       FROM book 
       LEFT JOIN review ON review.bookId = book.id 
+      ${title ? 'WHERE book.title LIKE ?' : ''}
       GROUP BY book.id`,
+      title ? [`%${title}%`] : [],
     );
 
     return result.map((book) => ({

@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Param, Delete, Query } from '@nestjs/common';
 import { BooksService } from './books.service';
 
 @Controller('books')
@@ -9,8 +9,8 @@ export class BooksController {
    * 책 목록 조회
    */
   @Get()
-  async findAll() {
-    return this.booksService.findAll();
+  async findAll(@Query('title') title?: string) {
+    return this.booksService.findAll(title);
   }
 
   /**
